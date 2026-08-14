@@ -194,5 +194,5 @@ All important AI actions will require human confirmation.
 **Nasrat Abid**
 Data Analyst and Meta Ads Specialist
 LMAR Marketing Real Estate Company
-Deep Data Lab — AI and Automation
+Adytics — Data and AI Automation
 
