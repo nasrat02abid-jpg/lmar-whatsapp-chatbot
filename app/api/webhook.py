@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import PlainTextResponse
 
@@ -26,3 +28,32 @@ def verify_webhook(
         status_code=403,
         detail="Webhook verification failed.",
     )
+
+
+@router.post("")
+async def receive_webhook(
+    payload: dict[str, Any],
+):
+    message_count = 0
+    status_count = 0
+
+    for entry in payload.get("entry", []):
+        for change in entry.get("changes", []):
+            if change.get("field") != "messages":
+                continue
+
+            value = change.get("value", {})
+
+            message_count += len(
+                value.get("messages", [])
+            )
+
+            status_count += len(
+                value.get("statuses", [])
+            )
+
+    return {
+        "status": "received",
+        "message_count": message_count,
+        "status_count": status_count,
+    }
