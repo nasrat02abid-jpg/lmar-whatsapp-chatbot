@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import PlainTextResponse
 
 from app.core.config import settings
+from app.services.message_parser import extract_messages
 
 
 router = APIRouter(
@@ -34,26 +35,20 @@ def verify_webhook(
 async def receive_webhook(
     payload: dict[str, Any],
 ):
-    message_count = 0
+    messages = extract_messages(payload)
+
     status_count = 0
 
     for entry in payload.get("entry", []):
         for change in entry.get("changes", []):
-            if change.get("field") != "messages":
-                continue
-
             value = change.get("value", {})
-
-            message_count += len(
-                value.get("messages", [])
-            )
-
             status_count += len(
                 value.get("statuses", [])
             )
 
     return {
         "status": "received",
-        "message_count": message_count,
+        "message_count": len(messages),
         "status_count": status_count,
+        "messages": messages,
     }
